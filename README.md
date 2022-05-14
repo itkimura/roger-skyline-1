@@ -25,9 +25,9 @@ https://www.debian.org/
 
 # Partition setting
 Need to create
-*   4.2GB, primary, beggining, ext4, 
+*   4.2GB, primary, beggining, ext4, on the root /
 *   500MB, swap
-*   Rest memory, logical, ext4, home/
+*   Rest memory, logical, ext4, on /home
 
 ## How to set up
 1. Choose manual for partitioning method
@@ -57,15 +57,6 @@ apt upgrade sudo
 
 ## Check Partition size
 ```
-fdisk -l
-```
-Result:
-
-<img width="587" alt="Screen Shot 2022-05-10 at 2 28 26 PM" src="https://user-images.githubusercontent.com/61685238/167618498-43abec6f-2f75-41de-9bdf-298d67d72cf2.png">
-
-Or alternatively,
-
-```
 sudo apt install parted
 sudo parted
 unit GB
@@ -74,6 +65,18 @@ print all
 Result:
 
 <img width="569" alt="Screen Shot 2022-05-10 at 2 19 37 PM" src="https://user-images.githubusercontent.com/61685238/167617709-e269961a-aba3-4837-8ec5-364417e933c7.png">
+
+Change pertition size 
+```
+sudo parted
+resizepart
+```
+
+Make new partition by command line
+```
+sudo parted
+mkpart
+```
 
 ## Display TOTAL Hard Disk Size
 
