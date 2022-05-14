@@ -127,4 +127,20 @@ sudo apt update
 sudo apt install net-tools
 vim ~/.bashrc
 ```
+And add ```export PATH=/usr/sbin:$PATH``` and run ```source ~/.bashrc```. Then ready to use ifconfig in debian.
 
+### Make static IP
+1.  Edit the ```/etc/network/interfaces``` file to setup the primary network. Change the primary network line as
+```
+# The primary network interface
+auto enp0s3
+```
+2.  Create an ```enp0s3``` file in /etc/network/interfaces.d/ and add:
+```
+iface enp0s3 inet static
+            address 10.11.1.200 #(choosend ip under same subnet, i choosed 200)
+            netmask 255.255.255.252
+            gateway 10.11.254.254
+```  
+```address``` should be 
+```netmask``` \30 is 255.255.255.252 Check <a href="https://www.pawprint.net/designresources/netmask-converter.php">Netmask Conversions</a>
