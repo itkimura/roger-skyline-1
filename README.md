@@ -150,3 +150,7 @@ Restart the network service
 sudo service networking restart
 ```
 Check the static IP address which you have assigned using ifconfig.
+
+## You have to change the default port of the SSH service by the one of your choice. SSH access HAS TO be done with publickeys. SSH root access SHOULD NOT be allowed directly, but with a user who can be root.
+1.  Edit the sshd config file ```/etc/ssh/sshd_config```
+2.  Restart the sshd searvice ```sudo service sshd restart```
