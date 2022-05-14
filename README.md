@@ -142,10 +142,10 @@ iface enp0s3 inet static
             netmask 255.255.255.252
             gateway 10.1X.254.254
 ```  
-VM is going to be on the same network as the host, so assign ```address``` as ```10.1x.0.0.```. X is the cluster number in Hive campus.  
+VM is going to be on the same network as the host, so assign ```address``` as ```10.1x.0.0```. X is the cluster number in Hive campus.  
 ```netmask``` \30 is 255.255.255.252 Check <a href="https://www.pawprint.net/designresources/netmask-converter.php">Netmask Conversions</a>
 
-Restart the network servicd
+Restart the network service
 ```
 sudo service networking restart
 ```
