@@ -88,24 +88,35 @@ Result:
 
 <img width="516" alt="Screen Shot 2022-05-10 at 2 30 19 PM" src="https://user-images.githubusercontent.com/61685238/167618759-563c86bb-94b0-46c3-b6dd-bf533bbe8cd3.png">
 
-## V.3 Network and Security Part
-### create a non-root user and give sudo access
+# V.3 Network and Security Part
+## You must create a non-root user to connect to the machine and work
 Add user
 ```
 sudo adduser [username]
 ```
-Give sudo access to a user
+Add password
 ```
-sudo usermod -aG [username]
+passwd [username]
 ```
 Login as the user
 ```
 su - [username]
 ```
-## OS update
+## Use sudo, with this user, to be able to perform operation requiring special rights.
+### OS update
 ```
+su
 apt-get update -y && apt-get upgrade -y
+apt-get install sudo vim -y
 ```
+```su``` enters root user
 ```apt-get update``` downloads the package lists from the repositories and "updates" them to get information on the newest versions of packages and their dependencies. ```apt-get upgrade``` will fetch new versions of packages existing on the machine if APT knows about these new versions by way of ```apt-get update.``` 
+Give sudo access to a user
+```
+sudo usermod -aG [username]
+```
+Also add write permissions to the /etc/sudoers file. In the file under # User priviledges information, add the new user under the root user with the following:
+```
+[username] ALL=(ALL:ALL) ALL
+```
 
-### DHCP and 
