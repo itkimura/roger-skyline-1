@@ -114,7 +114,7 @@ apt-get install sudo vim -y
 
 Give sudo access to a user
 ```
-sudo usermod -aG [username]
+usermod -aG sudo [username]
 ```
 Also add write permissions to the /etc/sudoers file. In the file under # User priviledges information, add the new user under the root user with the following:
 ```
