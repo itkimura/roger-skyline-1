@@ -110,7 +110,8 @@ apt-get update -y && apt-get upgrade -y
 apt-get install sudo vim -y
 ```
 ```su``` enters root user
-```apt-get update``` downloads the package lists from the repositories and "updates" them to get information on the newest versions of packages and their dependencies. ```apt-get upgrade``` will fetch new versions of packages existing on the machine if APT knows about these new versions by way of ```apt-get update.``` 
+```apt-get update``` downloads the package lists from the repositories and "updates" them to get information on the newest versions of packages and their dependencies. ```apt-get upgrade``` will fetch new versions of packages existing on the machine if APT knows about these new versions by way of ```apt-get update.```  ```sudo apt-get update``` is the command used to updates the package index files to get the latest list of available packages in the repositories, the ```-y``` option will not do anything as as the ```apt-get update``` does not prompt the user for any responses.
+
 Give sudo access to a user
 ```
 sudo usermod -aG [username]
@@ -118,5 +119,12 @@ sudo usermod -aG [username]
 Also add write permissions to the /etc/sudoers file. In the file under # User priviledges information, add the new user under the root user with the following:
 ```
 [username] ALL=(ALL:ALL) ALL
+```
+## We don't want you to use the DHCP service of your machine. You've got to configure it to have a static IP and a Netmask in \30
+### Install ifconfig on Debian 11
+```
+sudo apt update
+sudo apt install net-tools
+vim ~/.bashrc
 ```
 
