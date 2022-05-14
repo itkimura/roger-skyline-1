@@ -138,9 +138,15 @@ auto enp0s3
 2.  Create an ```enp0s3``` file in /etc/network/interfaces.d/ and add:
 ```
 iface enp0s3 inet static
-            address 10.11.1.200 #(choosend ip under same subnet, i choosed 200)
+            address 10.1X.0.0
             netmask 255.255.255.252
-            gateway 10.11.254.254
+            gateway 10.1X.254.254
 ```  
-```address``` should be 
+VM is going to be on the same network as the host, so assign ```address``` as ```10.1x.0.0.```. X is the cluster number in Hive campus.  
 ```netmask``` \30 is 255.255.255.252 Check <a href="https://www.pawprint.net/designresources/netmask-converter.php">Netmask Conversions</a>
+
+Restart the network servicd
+```
+sudo service networking restart
+```
+Check the static IP address which you have assigned using ifconfig.
