@@ -152,5 +152,27 @@ sudo service networking restart
 Check the static IP address which you have assigned using ifconfig.
 
 ## You have to change the default port of the SSH service by the one of your choice. SSH access HAS TO be done with publickeys. SSH root access SHOULD NOT be allowed directly, but with a user who can be root.
-1.  Edit the sshd config file ```/etc/ssh/sshd_config```
-2.  Restart the sshd searvice ```sudo service sshd restart```
+1.  Check if the port number is free
+```
+lsof -i:424242
+```
+2.  Edit the sshd config file ```/etc/ssh/sshd_config``` and change default number
+```
+#Port 22
+Port 424242
+```
+3.  Syntax check of the configuration file
+```
+sshd -t
+```
+4.  Restart the sshd searvice ```sudo service sshd restart```
+5.  With ssh and you can create an ECDSA key "yes"
+```
+sudo ssh magic@10.11.1.200 -p 55556 (on VM terminal)
+```
+6.  Run ssh-keygen to generate a key pair and install the public key on the Virtual Machine OS
+```
+ssh-keygen
+ssh-copy-id [username]@[server IP address] -p [port number]
+```
+
