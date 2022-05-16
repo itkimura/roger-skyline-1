@@ -65,38 +65,24 @@ print all
 ```
 Result:
 
-<img width="569" alt="Screen Shot 2022-05-10 at 2 19 37 PM" src="https://user-images.githubusercontent.com/61685238/167617709-e269961a-aba3-4837-8ec5-364417e933c7.png">
+<img width="538" alt="Screen Shot 2022-05-16 at 12 03 36 PM" src="https://user-images.githubusercontent.com/61685238/168557841-1cdaec0f-da67-4148-ad05-38709a7509fe.png">
 
-Change pertition size 
+
+Change pertition size in parted mode
 ```
-sudo parted
 resizepart
 ```
 
-Make new partition by command line
+Make new partition by command line in parted mode
 ```
-sudo parted
 mkpart
 ```
-
-### Display TOTAL Hard Disk Size
-
-```
-fdick -l | grep Disk
-```
-Result:
-
-<img width="516" alt="Screen Shot 2022-05-10 at 2 30 19 PM" src="https://user-images.githubusercontent.com/61685238/167618759-563c86bb-94b0-46c3-b6dd-bf533bbe8cd3.png">
 
 # V.3 Network and Security Part
 ## You must create a non-root user to connect to the machine and work
 Add user
 ```
 sudo adduser [username]
-```
-Add password
-```
-passwd [username]
 ```
 Login as the user
 ```
@@ -116,7 +102,7 @@ Give sudo access to a user
 ```
 usermod -aG sudo [username]
 ```
-Also add write permissions to the /etc/sudoers file. In the file under # User priviledges information, add the new user under the root user with the following:
+Also add write permissions to the ```/etc/sudoers``` file. In the file under # User priviledges information, add the new user under the root user with the following:
 ```
 [username] ALL=(ALL:ALL) ALL
 ```
