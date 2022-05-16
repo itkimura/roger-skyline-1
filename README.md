@@ -46,6 +46,13 @@ Need to create
 6.  Remeber to select Yes to install the GRUB boot loader
 <img width="600" alt="Screen Shot 2022-05-10 at 2 12 03 PM" src="https://user-images.githubusercontent.com/61685238/167616057-4eeee8b0-03d8-4093-9c8f-011b16a68f59.png">
 
+### Change Default Machine Folder
+Visual Box > Preference > Default Machine Folder:/goinfre/itkimrua
+
+<img width="554" alt="Screen Shot 2022-05-16 at 5 43 20 PM" src="https://user-images.githubusercontent.com/61685238/168619550-88bf54f7-d211-4ae9-b429-06cb5a05b59c.png">
+
+*This allows you to make Clone of VM
+
 ## OS update
 ```
 su
@@ -108,21 +115,32 @@ vim ~/.bashrc
 ```
 And add ```export PATH=/usr/sbin:$PATH``` and run ```source ~/.bashrc```. Then ready to use ifconfig in debian.
 
+
+### Enable DHCP
+Visual Box > File > Host Network Manager > Uncheck Enable DHCP Server
+<img width="600" alt="Screen Shot 2022-05-16 at 5 11 41 PM" src="https://user-images.githubusercontent.com/61685238/168617668-9aab0572-8c37-4f11-885e-95eea2602669.png">
+
+### Set preferences of the VM
+* First interface as NAT
+* Host-Only Adapter (chose the host created ins step 1)
+<img width="655" alt="Screen Shot 2022-05-16 at 5 34 36 PM" src="https://user-images.githubusercontent.com/61685238/168617680-f23406a2-4629-4759-8bd2-92ac76564bcb.png">
+*VM should be powered off by ```sudo poweroff```
+
 ### Make static IP
 1.  Edit the ```/etc/network/interfaces``` file to setup the primary network. Change the primary network line as
 ```
 # The primary network interface
 auto enp0s3
-```
-2.  Create an ```enp0s3``` file in /etc/network/interfaces.d/ and add:
-```
-iface enp0s3 inet static
-            address 10.0.2.15
+iface enp0s3 inet dhcp
+auto enp0s8
+iface enp0s8 inet static
+            address 192.168.56.2
             netmask 255.255.255.252
-            gateway 10.0.2.255
-```  
-sVM is going to be on the same network as the host, so assign ```address``` as ```10.1x.0.0```. X is the cluster number in Hive campus.  
-```netmask``` \30 is 255.255.255.252 Check <a href="https://www.pawprint.net/designresources/netmask-converter.php">Netmask Conversions</a>
+```
+<img width="804" alt="Screen Shot 2022-05-16 at 5 40 07 PM" src="https://user-images.githubusercontent.com/61685238/168618707-94d87d28-9e8c-40fa-8b7f-faca21162284.png">
+
+*```address``` should be unique
+*```netmask``` \30 is 255.255.255.252 Check <a href="https://www.pawprint.net/designresources/netmask-converter.php">Netmask Conversions</a>
 
 Restart the network service
 ```
@@ -131,11 +149,11 @@ sudo service networking restart
 Check the static IP address which you have assigned using ifconfig.
 
 ## You have to change the default port of the SSH service by the one of your choice. SSH access HAS TO be done with publickeys. SSH root access SHOULD NOT be allowed directly, but with a user who can be root.
-1.  Check if the port number is free
+1. Check if the port number is free
 ```
 lsof -i:4242
 ```
-2.  Edit the sshd config file ```/etc/ssh/sshd_config``` and change default number
+2. Edit the sshd config file ```/etc/ssh/sshd_config``` and change default number
 ```
 #Port 22
 Port 4242
@@ -144,20 +162,19 @@ Port 4242
 ```
 sshd -t
 ```
-4.  Restart the sshd searvice ```sudo service sshd restart``` with this, user can login via ssh with ssh caruy@10.12.203.42 -p 4242`.
+4.  Restart the sshd searvice ```/etc/init.d/ssh restart``` with this, 
 5.  Set up SSH access with public keys instead. Run ssh-keygen to generate a key pair. Then install the public key on the Virtual Machine OS with the following syntax and set password.
 ```
 ssh-copy-id [username]@[server IP address] -p [port number]
 ```
-5.  Set up SSH access with public key
+5.  login via ssh from Mac Termonal
 ```
-lsof -i4:4242 -a -P
+ssh [username]@[IP address] -p [port number]
 ```
+
 Result:
-```
-COMMAND     PID         USER        FD          TYPE        DEVICE      SIZE/OFF    NODE NAME
-sshd        1084        itkimura    3u          IPv4        15895       0t0         TCP *:4242 (LISTEN)  
-```
+
+<img width="793" alt="Screen Shot 2022-05-16 at 5 53 09 PM" src="https://user-images.githubusercontent.com/61685238/168621564-3a2be2ff-0f06-4529-8f4f-c5ed65d9d9c3.png">
 
 *To disable the root login directly, edit the ```/etc/ssh/sshd_config file```, chainging the PermitRootLogin setting to no
 
@@ -175,3 +192,43 @@ sudo ufw enable
 *Remove UFW altogether from your Debian system ```sudo apt remove ufw --purge```
 
 *Do not remove UFW unless you have a solid option or know how to use IPTables, especially when running a server environment connected to the public.
+
+### Set up ufw
+1. Set up default policies to deny all incoming traffic, and allow all outgoing traffic. The default rules handle traffic that do not explicitly match any other rules.
+```
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+```
+2. Add ufw ports to SSH, HTTPS, HTTP 
+```
+sudo ufw allow 4242     # SSH allows connection from port
+sudo ufw allow 80	# HHTPS Web servicem such as Apache, typically listen for HTTP requests on port 80 (You can also replace 80 with http)
+sudo ufw allow 443	# Allows https traffic
+```
+3. Enable the UFW to activate the firewall
+```
+sudo ufw enable
+```
+4. To check ufw status:
+```
+sudo ufw status verbose
+sudo ufw show added
+```
+5. Delete rules
+```
+sudo ufw status numbered
+sudo ufw delete <rule-number-here>
+```
+6. Check open ports
+```
+sudo apt update
+sudo apt install nmap -y
+nmap -A 192.168.56.2
+netstat -lntu           #For opened Network ports
+```
+*https://www.freecodecamp.org/news/what-is-nmap-and-how-to-use-it-a-tutorial-for-the-greatest-scanning-tool-of-all-time
+
+For more information about firewalls:
+* https://www.digitalocean.com/community/tutorials/how-to-set-up-a-firewall-with-ufw-on-debian-10
+* https://opensource.com/article/18/9/linux-iptables-firewalld
+
