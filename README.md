@@ -46,13 +46,14 @@ Need to create
 6.  Remeber to select Yes to install the GRUB boot loader
 <img width="600" alt="Screen Shot 2022-05-10 at 2 12 03 PM" src="https://user-images.githubusercontent.com/61685238/167616057-4eeee8b0-03d8-4093-9c8f-011b16a68f59.png">
 
-## Install sudo
+## OS update
 ```
-apt install sudo
-sudo apt update
-sudo upgrade
+su
+apt-get update -y && apt-get upgrade -y
+apt-get install sudo vim -y
 ```
-* check the difference <a href="https://linuxconfig.org/apt-update-vs-apt-upgrade">apt update VS apt upgrade</a>
+```su``` enters root user
+```apt-get update``` downloads the package lists from the repositories and "updates" them to get information on the newest versions of packages and their dependencies. ```apt-get upgrade``` will fetch new versions of packages existing on the machine if APT knows about these new versions by way of ```apt-get update.```  ```sudo apt-get update``` is the command used to updates the package index files to get the latest list of available packages in the repositories, the ```-y``` option will not do anything as as the ```apt-get update``` does not prompt the user for any responses.
 
 ## Partition size and disk size
 
@@ -89,14 +90,6 @@ Login as the user
 su - [username]
 ```
 ## Use sudo, with this user, to be able to perform operation requiring special rights.
-### OS update
-```
-su
-apt-get update -y && apt-get upgrade -y
-apt-get install sudo vim -y
-```
-```su``` enters root user
-```apt-get update``` downloads the package lists from the repositories and "updates" them to get information on the newest versions of packages and their dependencies. ```apt-get upgrade``` will fetch new versions of packages existing on the machine if APT knows about these new versions by way of ```apt-get update.```  ```sudo apt-get update``` is the command used to updates the package index files to get the latest list of available packages in the repositories, the ```-y``` option will not do anything as as the ```apt-get update``` does not prompt the user for any responses.
 
 Give sudo access to a user
 ```
@@ -140,25 +133,33 @@ Check the static IP address which you have assigned using ifconfig.
 ## You have to change the default port of the SSH service by the one of your choice. SSH access HAS TO be done with publickeys. SSH root access SHOULD NOT be allowed directly, but with a user who can be root.
 1.  Check if the port number is free
 ```
-lsof -i:424242
+lsof -i:4242
 ```
 2.  Edit the sshd config file ```/etc/ssh/sshd_config``` and change default number
 ```
 #Port 22
-Port 424242
+Port 4242
 ```
 3.  Syntax check of the configuration file
 ```
 sshd -t
 ```
-4.  Restart the sshd searvice ```sudo service sshd restart```
-5.  With ssh and you can create an ECDSA key "yes"
+4.  Restart the sshd searvice ```sudo service sshd restart``` with this, user can login via ssh with ssh caruy@10.12.203.42 -p 4242`.
+5.  Set up SSH access with public keys instead. Run ssh-keygen to generate a key pair. Then install the public key on the Virtual Machine OS with the following syntax and set password.
 ```
-sudo ssh magic@10.11.1.200 -p 55556 (on VM terminal)
-```
-6.  Run ssh-keygen to generate a key pair and install the public key on the Virtual Machine OS
-```
-ssh-keygen
 ssh-copy-id [username]@[server IP address] -p [port number]
 ```
+5.  Set up SSH access with public key
+```
+lsof -i4:4242 -a -P
+```
+Result:
+```
+COMMAND     PID         USER        FD          TYPE        DEVICE      SIZE/OFF    NODE NAME
+sshd        1084        itkimura    3u          IPv4        15895       0t0         TCP *:4242 (LISTEN)  
+```
+
+*To disable the root login directly, edit the ```/etc/ssh/sshd_config file```, chainging the PermitRootLogin setting to no
+
+## You have to set the rules of your firewall on your server only with the services used outside the VM.
 
