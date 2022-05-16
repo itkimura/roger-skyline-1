@@ -117,11 +117,11 @@ auto enp0s3
 2.  Create an ```enp0s3``` file in /etc/network/interfaces.d/ and add:
 ```
 iface enp0s3 inet static
-            address 10.1X.0.0
+            address 10.0.2.15
             netmask 255.255.255.252
-            gateway 10.1X.254.254
+            gateway 10.0.2.255
 ```  
-VM is going to be on the same network as the host, so assign ```address``` as ```10.1x.0.0```. X is the cluster number in Hive campus.  
+sVM is going to be on the same network as the host, so assign ```address``` as ```10.1x.0.0```. X is the cluster number in Hive campus.  
 ```netmask``` \30 is 255.255.255.252 Check <a href="https://www.pawprint.net/designresources/netmask-converter.php">Netmask Conversions</a>
 
 Restart the network service
@@ -162,4 +162,16 @@ sshd        1084        itkimura    3u          IPv4        15895       0t0     
 *To disable the root login directly, edit the ```/etc/ssh/sshd_config file```, chainging the PermitRootLogin setting to no
 
 ## You have to set the rules of your firewall on your server only with the services used outside the VM.
+### Install ufw
+Install and set up UFW Firewall:
+```
+sudo apt install ufw -y 
+sudo systemctl enable ufw --now
+sudo systemctl status ufw
+sudo ufw enable
+```
+*Disable UFW by ```sudo ufw disable```
 
+*Remove UFW altogether from your Debian system ```sudo apt remove ufw --purge```
+
+*Do not remove UFW unless you have a solid option or know how to use IPTables, especially when running a server environment connected to the public.
