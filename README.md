@@ -49,8 +49,8 @@ Need to create
 ## Install sudo
 ```
 apt install sudo
-apt update sudo
-apt upgrade sudo
+sudo apt update
+sudo upgrade
 ```
 * check the difference <a href="https://linuxconfig.org/apt-update-vs-apt-upgrade">apt update VS apt upgrade</a>
 
