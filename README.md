@@ -232,3 +232,4 @@ For more information about firewalls:
 * https://www.digitalocean.com/community/tutorials/how-to-set-up-a-firewall-with-ufw-on-debian-10
 * https://opensource.com/article/18/9/linux-iptables-firewalld
 
+## You have to set a DOS (Denial Of Service Attack) protection on your open ports of your VM.
