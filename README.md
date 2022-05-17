@@ -370,4 +370,45 @@ sudo service portsentry status
 7. Check open ports and which application is listening on what port by using ```lsof -i```. Portsentry logs in the file ```/var/log/syslog```, where you can see logs of any attacks. The following command also lists blocked IP addresses via iptables ```sudo iptables -L -n -v```. Also test that portsentry has detected a port scan, by running ```sudo nmap -v -A -sV 10.12.203.42``` from another VM. the ```/var/log/syslog``` should who an attackalert from the attacking host IP, and subsequently dropping the packets from the attacker IP.
 
 ## Stop the services you don’t need for this project.
+List the service which are enabled at the moment
+```
+sudo systemctl list-unit-files --type=service | grep "enabled "
+```
+|Command|Description|
+|-----|-----|
+|systemctl|Query or send control commands to the system manager|
+|list-units [PATTERN...]|List units currently in memory|
+|--type=TYPE|List units of a particular type|
+|grep " "|Search for PATTERNS in each FILE.|
 
+Stop the service
+```
+sudo systemctl stop [application].service
+```
+Disable the service
+```
+sudo systemctl disable [application].service
+```
+*Disabling the service will prevent it from starting automatically whenever the machine is launched.
+
+The services which you need for this project
+|Name|Description|
+|-----|-----|
+|apache2.service|Apache Hypertext Transfer Protocol (HTTP) Server|
+|apparmor.service|Kernel enhancement to confine programs to a limited set of resources|
+|cron.service|Daemon to execute scheduled commands (Vixie Cron)|
+|fail2ban.service|A set of server and client programs to limit brute force authentication attempts|
+|getty@.service|Opens a tty port, prompts for login and invokes /bin/login command.|
+|keyboard-setup.service|Keyboard setting|
+|networking.service|Raises or downs the network interfaces configured in /etc/network/interfaces|
+|rsyslog.service|Syslog server, for managing logs|
+|ssh.service|Open SSH remote login client|
+|systemd-timesyncd.service|Used to synchronize the local system clock with a remote network time protocol server.|
+|ufw.service|Managing a netfilter firewall|
+
+## Create a script that updates all the sources of package, then your packages and which logs the whole in a file named /var/log/update_script.log. Create a scheduled task for this script once a week at 4AM and every time the machine reboots.
+
+## Make a script to monitor changes of the /etc/crontab file and sends an email toroot if it has been modified. Create a scheduled script task every day at midnight.
+
+# VI.1 Web Part
+# VI.2 Deployment Part
