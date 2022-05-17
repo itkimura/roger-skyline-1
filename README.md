@@ -460,7 +460,45 @@ fi
 ```
 5. To read the mail, execute ```mailx```
 # VI.1 Web Part
+
+### Adjusting the Firewall
+Before testing Apache, it’s necessary to modify the firewall settings to allow outside access to the default web ports. 
+List the ufw application profiles by typing:
+```
+sudo ufw app list
+```
+You will receive a list of the application profiles. As indicated by the output, there are three profiles available for Apache:
+
+|App name|Description|
+|---|---|
+|Apache|This profile opens only port 80 (normal, unencrypted web traffic)|
+|Apache Full|This profile opens both port 80 (normal, unencrypted web traffic) and port 443 (TLS/SSL encrypted traffic)|
+|Apache Secure|This profile opens only port 443 (TLS/SSL encrypted traffic)|
+
+It is recommended that you enable the most restrictive profile that will still allow the traffic you’ve configured. Since we haven’t configured SSL for our server yet in this guide, we will only need to allow traffic on port 80:
+```
+sudo ufw allow 'Apache'
+```
+You can verify the change by typing:
+```
+sudo ufw status
+```
+### Create the SSL Certificate
+
+Create the SSL certificate with the ```openssl``` command:
+```sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/apache-selfsigned.key -out /etc/ssl/certs/apache-selfsigned.crt```
+|Command|Description|
+|-----|-----|
+|openssl|This is the basic command line tool for creating and managing OpenSSL certificates, keys, and other files.|
+|req|This subcommand specifies that we want to use X.509 certificate signing request (CSR) management. The “X.509” is a public key infrastructure standard that SSL and TLS adheres to for its key and certificate management. We want to create a new X.509 cert, so we are using this subcommand.|
+|-x509|This further modifies the previous subcommand by telling the utility that we want to make a self-signed certificate instead of generating a certificate signing request, as would normally happen.|
+|-nodes|This tells OpenSSL to skip the option to secure our certificate with a passphrase. We need Apache to be able to read the file, without user intervention, when the server starts up. A passphrase would prevent this from happening because we would have to enter it after every restart.|
+|-days 365|This option sets the length of time that the certificate will be considered valid. We set it for one year here.|
+|-newkey rsa:2048|This specifies that we want to generate a new certificate and a new key at the same time. We did not create the key that is required to sign the certificate in a previous step, so we need to create it along with the certificate. The rsa:2048 portion tells it to make an RSA key that is 2048 bits long.|
+|-keyout|This line tells OpenSSL where to place the generated private key file that we are creating.|
+|-out|This tells OpenSSL where to place the certificate that we are creating.|
 ### Useful links
+* <a href="https://www.digitalocean.com/community/tutorials/how-to-install-the-apache-web-server-on-ubuntu-20-04">How To Install the Apache Web Server on Ubuntu 20.04</a>
 * <a href="https://www.digitalocean.com/community/tutorials/how-to-create-a-self-signed-ssl-certificate-for-apache-in-ubuntu-16-04">How To Create a Self-Signed SSL Certificate for Apache in Ubuntu 16.04</a>
 * <a href="https://stackoverflow.com/questions/51537084/i-installed-apache-2-but-in-sudo-ufw-app-list-there-is-no-apache-applications-in">i installed apache 2 but in sudo ufw app list there is no apache applications in the app list</a>
 # VI.2 Deployment Part
