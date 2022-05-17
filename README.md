@@ -407,8 +407,60 @@ The services which you need for this project
 |ufw.service|Managing a netfilter firewall|
 
 ## Create a script that updates all the sources of package, then your packages and which logs the whole in a file named /var/log/update_script.log. Create a scheduled task for this script once a week at 4AM and every time the machine reboots.
+1. Create a script
+```
+sudo touch /usr/local/bin/update.sh
+sudo chmod +x /usr/local/bin/update.sh
+```
+2. Update script by ```sudo vim /usr/local/bin/update.sh```
+```
+#!/bin/bash
+sudo apt-get update -y >> /var/log/update_script.log
+sudo apt-get upgrade -y >> /var/log/update_script.log
+```
+3. Update crontab file with ```sudo crontab -e``` and add:
+```
+0 4 * * 0 sudo /usr/local/bin/update.sh
+@reboot sudo /usr/local/bin/update.sh
+```
+*The ```cron``` command-line utility, also known as cron job is a job scheduler on Unix-like operating systems.
+
+*crontab format is```minute hour day(month) month day(week) command```
 
 ## Make a script to monitor changes of the /etc/crontab file and sends an email toroot if it has been modified. Create a scheduled script task every day at midnight.
 
+1. Install mailx command
+```
+sudo apt install mailutils
+```
+*mailx is a Mail User Agent program which is a console application that is used for sending and receiving emails
+2. Create a script
+```
+sudo touch /usr/local/bin/monitor_cron.sh
+sudo chmod +x /usr/local/bin/monitor_cron.sh
+```
+3. Update script by ```sudo vim /usr/local/bin/monitor_cron.sh```
+```
+#!/bin/bash
+if [ ! -e /etc/crontab.back ]
+then
+	exit 0
+fi
+DIFF=$(diff /etc/crontab /etc/crontab.back)
+sudo bash -c "cat /etc/crontab > /etc/crontab.back"
+if [ "$DIFF" != "" ]
+then
+	echo "crontab monitor: change detected, alerting root!"
+	echo "$DIFF" | mailx -s "crontab monitor: change detected" root
+fi
+```
+4. Update crontab file with ```sudo crontab -e``` and add:
+```
+0 0 * * * sudo /usr/local/bin/monitor_cron.sh
+```
+5. To read the mail, execute ```mailx```
 # VI.1 Web Part
+### Useful links
+* <a href="https://www.digitalocean.com/community/tutorials/how-to-create-a-self-signed-ssl-certificate-for-apache-in-ubuntu-16-04">How To Create a Self-Signed SSL Certificate for Apache in Ubuntu 16.04</a>
+* <a href="https://stackoverflow.com/questions/51537084/i-installed-apache-2-but-in-sudo-ufw-app-list-there-is-no-apache-applications-in">i installed apache 2 but in sudo ufw app list there is no apache applications in the app list</a>
 # VI.2 Deployment Part
