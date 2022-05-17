@@ -461,7 +461,7 @@ fi
 5. To read the mail, execute ```mailx```
 # VI.1 Web Part
 
-### Adjusting the Firewall
+### Adjusting the Firewall if you need
 Before testing Apache, it’s necessary to modify the firewall settings to allow outside access to the default web ports. 
 List the ufw application profiles by typing:
 ```
@@ -486,7 +486,9 @@ sudo ufw status
 ### Create the SSL Certificate
 
 Create the SSL certificate with the ```openssl``` command:
-```sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/apache-selfsigned.key -out /etc/ssl/certs/apache-selfsigned.crt```
+```
+sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/apache-selfsigned.key -out /etc/ssl/certs/apache-selfsigned.crt
+```
 |Command|Description|
 |-----|-----|
 |openssl|This is the basic command line tool for creating and managing OpenSSL certificates, keys, and other files.|
@@ -497,6 +499,85 @@ Create the SSL certificate with the ```openssl``` command:
 |-newkey rsa:2048|This specifies that we want to generate a new certificate and a new key at the same time. We did not create the key that is required to sign the certificate in a previous step, so we need to create it along with the certificate. The rsa:2048 portion tells it to make an RSA key that is 2048 bits long.|
 |-keyout|This line tells OpenSSL where to place the generated private key file that we are creating.|
 |-out|This tells OpenSSL where to place the certificate that we are creating.|
+
+You’ll be asked a few questions about your server in order to embed the information correctly in the certificate.
+Fill out the prompts appropriately. The most important line is the one that requests the Common Name (e.g. server FQDN or YOUR name). You need to enter the domain name associated with your server or, more likely, your server’s public IP address.
+
+The entire list of prompts will output as the following:
+```
+Country Name (2 letter code) [AU]:FI
+State or Province Name (full name) [Some-State]:New Uusimaa
+Locality Name (eg, city) []:Helsinki
+Organization Name (eg, company) [Internet Widgits Pty Ltd]:Hive Helsinki
+Organizational Unit Name (eg, section) []:Student
+Common Name (e.g. server FQDN or YOUR name) []: your server_IP_address
+Email Address []:username@your_domain.com
+```
+### Creating an Apache Configuration Snippet with Strong Encryption Settings
+Create the configuration of the certification:
+```
+sudo touch /etc/apache2/conf-available/ssl-params.conf
+```
+Now paste the configuration into the file ```sudo vim /etc/apache2/conf-available/ssl-params.conf```
+```
+SSLCipherSuite EECDH+AESGCM:EDH+AESGCM
+# Requires Apache 2.4.36 & OpenSSL 1.1.1
+SSLProtocol -all +TLSv1.3 +TLSv1.2
+SSLOpenSSLConfCmd Curves X25519:secp521r1:secp384r1:prime256v1
+# Older versions
+# SSLProtocol All -SSLv2 -SSLv3 -TLSv1 -TLSv1.1
+SSLHonorCipherOrder On
+# Disable preloading HSTS for now.  You can use the commented out header line that includes 
+# the "preload" directive if you understand the implications.
+# Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"
+Header always set X-Frame-Options DENY
+Header always set X-Content-Type-Options nosniff
+# Requires Apache >= 2.4
+SSLCompression off
+SSLUseStapling on
+SSLStaplingCache "shmcb:logs/stapling-cache(150000)"
+# Requires Apache >= 2.4.11
+SSLSessionTickets Off
+```
+
+### Modifying the Default Apache SSL Virtual Host File
+
+1. Back up the original SSL Virtual Host file:
+```
+sudo cp /etc/apache2/sites-available/default-ssl.conf /etc/apache2/sites-available/default-ssl.conf.bak
+```
+
+2. Open the SSL Virtual Host file to make adjustments:
+```
+sudo vim /etc/apache2/sites-available/default-ssl.conf
+```
+3. Modify the following lines in the file as below
+```
+ServerAdmin [you_email@example.com]
+ServerName [server_domain_or_IP]
+SSLCertificateFile [/etc/ssl/certs/apache-selfsigned.crt
+SSLCertificateKeyFile [/etc/ssl/private/apache-selfsigned.key]
+```
+
+### Modifying the HTTP Host File to Redirect to HTTPS
+1. To adjust the unencrypted Virtual Host file to redirect all traffic to be SSL encrypted, open the file below:
+```
+sudo vim /etc/apache2/sites-available/000-default.conf
+```
+2. Within the VirtualHost configuration blocks, add a Redirect directive, pointing all traffic to the SSL version of the site:
+```
+<VirtualHost *:80>
+        . . .
+
+        Redirect "/" "https://your_domain_or_IP/"
+
+        . . .
+</VirtualHost>
+```
+
+### Enabling the Changes in Apache
+
+
 ### Useful links
 * <a href="https://www.digitalocean.com/community/tutorials/how-to-install-the-apache-web-server-on-ubuntu-20-04">How To Install the Apache Web Server on Ubuntu 20.04</a>
 * <a href="https://www.digitalocean.com/community/tutorials/how-to-create-a-self-signed-ssl-certificate-for-apache-in-ubuntu-16-04">How To Create a Self-Signed SSL Certificate for Apache in Ubuntu 16.04</a>
