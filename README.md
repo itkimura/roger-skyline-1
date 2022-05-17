@@ -233,3 +233,75 @@ For more information about firewalls:
 * https://opensource.com/article/18/9/linux-iptables-firewalld
 
 ## You have to set a DOS (Denial Of Service Attack) protection on your open ports of your VM.
+### Install fail2ban
+fail2ban is a tool protects servers from unauthorised access. Specifically, it monitors the content recorded in log files and, if it finds logs with repeated authentication failures or logs with continuous access, it automatically adjusts the firewall to protect the server from unauthorised access.
+```
+sudo apt-get install fail2ban
+```
+### fail2ban setting files
+|File name|Description|
+|-----|----|
+|fail2ban.conf|Specify log storage location and log level|
+|filter.d/*.conf|Defines access violations using regular expressions 	|
+|action.d/*.conf|Define the action to be taken when an access violation occurs|
+|jail.conf|Defines how much (time, number of times) access is blocked. However, this file is not edited. So need to make jail.local to change the setting|
+
+### Set up jail.local
+Copy jail.conf to jail.local
+```
+sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
+```
+Set rules in jail.local
+```
+sudo vim /etc/fail2ban/jail.local
+```
+|File name|Description|
+|-----|----|
+|bantime|How long we should drop incoming GET requests for a given IP for, in this case it's 5 minutes|
+|findtime|The time period in seconds in which we're counting "retries" (300 seconds = 5 mins)|
+|maxRetry|How many GETs we can have in the findtime period before getting narky|
+
+Set rules in jail.local file
+```
+[sshd]
+
+enabled = true
+port = 4242
+findtime  = 600
+maxretry  = 5
+bantime   = 900
+logpath = %(sshd_log)s
+backend = %(sshd_backend)s
+
+[http-get-dos] 
+
+enabled = true
+port = http,https
+filter = http-get-dos
+findtime  = 300
+maxretry  = 300
+bantime   = 300
+logpath = /var/log/apache2/access.log
+action = iptables[name=HTTP, port=http, protocol=tcp]
+```
+Configule the filter file by ```sudo vim /etc/fail2ban/filter.d/http-get-dos.conf``` and add filter following synatic
+```
+[Definition]
+failregex = ^<HOST> -.*"(GET|POST).*
+ignoreregex =
+```
+Restart ufw and fail2ban
+```
+sudo ufw reload
+sudo service fail2ban restart
+sudo systemctl enable fail2ban
+```
+Result:
+```
+Attack from your mac: ab -k -c 350 -n 20000 http://192.168.56.2/
+Check if f2b rule for attacker IP has appeared in iptables: sudo iptables -S  
+
+sudo tail -f /var/log/apache2/access.log
+sudo cat /var/log/ufw.log
+sudo cat /var/log/syslog
+```
