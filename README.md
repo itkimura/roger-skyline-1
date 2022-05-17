@@ -320,5 +320,16 @@ ps -LC fail2ban-server -o comm,pid,ppid
 ### Test ssh
 Make fail ssh logins from the client to the server
 ```
-ssh 
+ssh itkimura@192.168.56.2 -p 4242
+```
+Result of 5 times fail try:
+
+<img width="554" alt="Screen Shot 2022-05-17 at 1 36 37 PM" src="https://user-images.githubusercontent.com/61685238/168792617-1f74ad05-3004-455f-b53d-f50625ee1bff.png">
+
+Check fail2ban status by ```sudo fail2ban-client status sshd``` and you can see your IP is banned. Result:
+
+<img width="452" alt="Screen Shot 2022-05-17 at 1 38 19 PM" src="https://user-images.githubusercontent.com/61685238/168792856-f3e1a0ad-b85b-44d2-b4e4-c5d9413b667d.png">
+Unbanned the IP again
+```
+sudo fail2ban-client set sshd unbanip 192.168.56.1
 ```
