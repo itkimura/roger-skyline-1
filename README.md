@@ -333,3 +333,25 @@ Unbanned the IP again
 ```
 sudo fail2ban-client set sshd unbanip 192.168.56.1
 ```
+
+## You have to set a protection against scans on your VM’s open ports.
+PASD, Port Scan Attacks Detector, is used to detect the port scan attacks and other suspicious traffic by analyzing the iptables of Linux systems
+
+Install PASD
+```
+sudo apt-get update 
+sudo apt-get install psad
+```
+
+### Rsyslog Configuration
+Add the following line in Rsyslog configuration file by ```sudo vim /etc/rsyslog.conf```
+```
+kern.info |/var/lib/psad/psadfifo
+```
+Restart the ryslog service using following command
+```
+sudo /etc/init.d/rsyslog restart
+```
+
+### Psad Configuration
+Edit Psad Configuration file by ```sudo vim /etc/psad/psad.conf```
