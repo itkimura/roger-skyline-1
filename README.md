@@ -335,23 +335,39 @@ sudo fail2ban-client set sshd unbanip 192.168.56.1
 ```
 
 ## You have to set a protection against scans on your VM’s open ports.
-PASD, Port Scan Attacks Detector, is used to detect the port scan attacks and other suspicious traffic by analyzing the iptables of Linux systems
+Portsentry has the capability to use advanced port-scan detection even for the more sophisticated port scans.
 
-Install PASD
+1. Install Portsentry
 ```
-sudo apt-get update 
-sudo apt-get install psad
-```
-
-### Rsyslog Configuration
-Add the following line in Rsyslog configuration file by ```sudo vim /etc/rsyslog.conf```
-```
-kern.info |/var/lib/psad/psadfifo
-```
-Restart the ryslog service using following command
-```
-sudo /etc/init.d/rsyslog restart
+sudo apt update 
+sudo apt install portsentry
 ```
 
-### Psad Configuration
-Edit Psad Configuration file by ```sudo vim /etc/psad/psad.conf```
+
+2. Set up portsentry in advanced mode for the TCP and UDP protocols ```sudo vim /etc/default/portsentry```
+```
+TCP_MODE="atcp"
+UDP_MODE="audp"
+```
+3. Also edit the section Ignore Options to activate blocking with portsentry by ``` sudo vim /etc/portsentry/portsentry.conf```
+```
+BLOCK_UDP="1"
+BLOCK_TCP="1"
+```
+4. Configure portsentry to drop routes using iptables. Incoming request packets from malicious IP addresses will be dropped using the iptables command with DROP. We are using linux, so will uncomment the line:
+```
+#KILL_ROUTE="/sbin/iptables -I INPUT -s $TARGET$ -j DROP"
+```
+5. The above line is the packet filter, which portsentry.conf mentions as the PREFERRED method, and we needed to explicitly uncomment it. The default method uses the route ccommand, and is supposedly the leaast optimal way of blocking and does not provide complete protection against UDP attacks. We can comment out the following line:
+```
+#KILL_ROUTE="/sbin/route add -host $TARGET$ reject"
+```
+6. Restart the service and check its status:
+```
+sudo service portsentry start
+sudo service portsentry status
+```
+7. Check open ports and which application is listening on what port by using ```lsof -i```. Portsentry logs in the file ```/var/log/syslog```, where you can see logs of any attacks. The following command also lists blocked IP addresses via iptables ```sudo iptables -L -n -v```. Also test that portsentry has detected a port scan, by running ```sudo nmap -v -A -sV 10.12.203.42``` from another VM. the ```/var/log/syslog``` should who an attackalert from the attacking host IP, and subsequently dropping the packets from the attacker IP.
+
+## Stop the services you don’t need for this project.
+
