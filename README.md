@@ -233,6 +233,16 @@ For more information about firewalls:
 * https://opensource.com/article/18/9/linux-iptables-firewalld
 
 ## You have to set a DOS (Denial Of Service Attack) protection on your open ports of your VM.
+### Set up Apache2 webserver
+The Apache HTTP Server is a free and open-source cross-platform web server software.
+Install with:
+```
+sudo apt-get install apache2
+```
+Then test that the webserver is running by entering the ```http://[IP Address]/``` into your browser.
+This should give you an Apache2 default webpage,the html for which is located at /var/www/html/index.html
+*Check <a href="https://www.layerstack.com/resources/tutorials/Installing-Apache-server-on-Linux-Cloud-Servers">Installing Apache web server on Linux Cloud Servers</a>
+
 ### Install fail2ban
 fail2ban is a tool protects servers from unauthorised access. Specifically, it monitors the content recorded in log files and, if it finds logs with repeated authentication failures or logs with continuous access, it automatically adjusts the firewall to protect the server from unauthorised access.
 ```
@@ -261,7 +271,7 @@ sudo vim /etc/fail2ban/jail.local
 |findtime|The time period in seconds in which we're counting "retries" (300 seconds = 5 mins)|
 |maxRetry|How many GETs we can have in the findtime period before getting narky|
 
-Set rules in jail.local file
+Set sshd rules in jail.local file. Find [sshd] part and comment out the original texts and add:
 ```
 [sshd]
 
@@ -272,7 +282,9 @@ maxretry  = 5
 bantime   = 900
 logpath = %(sshd_log)s
 backend = %(sshd_backend)s
-
+```
+Add [http-get-dos] in the end of jail.local file.
+```
 [http-get-dos] 
 
 enabled = true
@@ -296,12 +308,17 @@ sudo ufw reload
 sudo service fail2ban restart
 sudo systemctl enable fail2ban
 ```
-Result:
+Check fail2ban status
 ```
-Attack from your mac: ab -k -c 350 -n 20000 http://192.168.56.2/
-Check if f2b rule for attacker IP has appeared in iptables: sudo iptables -S  
-
-sudo tail -f /var/log/apache2/access.log
-sudo cat /var/log/ufw.log
-sudo cat /var/log/syslog
+sudo fail2ban-client status sshd
+sudo fail2ban-client status http-get-dos
+```
+Check fail2ban process
+```
+ps -LC fail2ban-server -o comm,pid,ppid
+```
+### Test ssh
+Make fail ssh logins from the client to the server
+```
+ssh 
 ```
