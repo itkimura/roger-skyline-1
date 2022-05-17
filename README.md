@@ -49,7 +49,7 @@ Need to create
 ### Change Default Machine Folder
 Visual Box > Preference > Default Machine Folder:/goinfre/itkimrua
 
-<img width="554" alt="Screen Shot 2022-05-16 at 5 43 20 PM" src="https://user-images.githubusercontent.com/61685238/168619550-88bf54f7-d211-4ae9-b429-06cb5a05b59c.png">
+<img width="600" alt="Screen Shot 2022-05-16 at 5 43 20 PM" src="https://user-images.githubusercontent.com/61685238/168619550-88bf54f7-d211-4ae9-b429-06cb5a05b59c.png">
 
 *This allows you to make Clone of VM
 
@@ -73,7 +73,7 @@ print all
 ```
 Result:
 
-<img width="538" alt="Screen Shot 2022-05-16 at 12 03 36 PM" src="https://user-images.githubusercontent.com/61685238/168557841-1cdaec0f-da67-4148-ad05-38709a7509fe.png">
+<img width="600" alt="Screen Shot 2022-05-16 at 12 03 36 PM" src="https://user-images.githubusercontent.com/61685238/168557841-1cdaec0f-da67-4148-ad05-38709a7509fe.png">
 
 
 Change pertition size in parted mode
@@ -123,7 +123,7 @@ Visual Box > File > Host Network Manager > Uncheck Enable DHCP Server
 ### Set preferences of the VM
 * First interface as NAT
 * Host-Only Adapter (chose the host created ins step 1)
-<img width="655" alt="Screen Shot 2022-05-16 at 5 34 36 PM" src="https://user-images.githubusercontent.com/61685238/168617680-f23406a2-4629-4759-8bd2-92ac76564bcb.png">
+<img width="600" alt="Screen Shot 2022-05-16 at 5 34 36 PM" src="https://user-images.githubusercontent.com/61685238/168617680-f23406a2-4629-4759-8bd2-92ac76564bcb.png">
 *VM should be powered off by ```sudo poweroff```
 
 ### Make static IP
@@ -137,7 +137,7 @@ iface enp0s8 inet static
             address 192.168.56.2
             netmask 255.255.255.252
 ```
-<img width="804" alt="Screen Shot 2022-05-16 at 5 40 07 PM" src="https://user-images.githubusercontent.com/61685238/168618707-94d87d28-9e8c-40fa-8b7f-faca21162284.png">
+<img width="600" alt="Screen Shot 2022-05-16 at 5 40 07 PM" src="https://user-images.githubusercontent.com/61685238/168618707-94d87d28-9e8c-40fa-8b7f-faca21162284.png">
 
 *```address``` should be unique
 *```netmask``` \30 is 255.255.255.252 Check <a href="https://www.pawprint.net/designresources/netmask-converter.php">Netmask Conversions</a>
@@ -174,7 +174,7 @@ ssh [username]@[IP address] -p [port number]
 
 Result:
 
-<img width="793" alt="Screen Shot 2022-05-16 at 5 53 09 PM" src="https://user-images.githubusercontent.com/61685238/168621564-3a2be2ff-0f06-4529-8f4f-c5ed65d9d9c3.png">
+<img width="600" alt="Screen Shot 2022-05-16 at 5 53 09 PM" src="https://user-images.githubusercontent.com/61685238/168621564-3a2be2ff-0f06-4529-8f4f-c5ed65d9d9c3.png">
 
 *To disable the root login directly, edit the ```/etc/ssh/sshd_config file```, chainging the PermitRootLogin setting to no
 
@@ -324,11 +324,11 @@ ssh itkimura@192.168.56.2 -p 4242
 ```
 Result of 5 times fail try:
 
-<img width="554" alt="Screen Shot 2022-05-17 at 1 36 37 PM" src="https://user-images.githubusercontent.com/61685238/168792617-1f74ad05-3004-455f-b53d-f50625ee1bff.png">
+<img width="600" alt="Screen Shot 2022-05-17 at 1 36 37 PM" src="https://user-images.githubusercontent.com/61685238/168792617-1f74ad05-3004-455f-b53d-f50625ee1bff.png">
 
 Check fail2ban status by ```sudo fail2ban-client status sshd``` and you can see your IP is banned. Result:
 
-<img width="452" alt="Screen Shot 2022-05-17 at 1 38 19 PM" src="https://user-images.githubusercontent.com/61685238/168792856-f3e1a0ad-b85b-44d2-b4e4-c5d9413b667d.png">
+<img width="600" alt="Screen Shot 2022-05-17 at 1 38 19 PM" src="https://user-images.githubusercontent.com/61685238/168792856-f3e1a0ad-b85b-44d2-b4e4-c5d9413b667d.png">
 Unbanned the IP again
 ```
 sudo fail2ban-client set sshd unbanip 192.168.56.1
@@ -574,8 +574,50 @@ sudo vim /etc/apache2/sites-available/000-default.conf
         . . .
 </VirtualHost>
 ```
+You can change the Redirect to permanent, by modifying the following line in ```Redirect permanent "/" "https://[domain_or_IP]/"```
+
+Check your configuration for syntax errors:
+```
+sudo apache2ctl configtest
+```
+When you’re ready, restart Apache to make the redirect permanent:
+```
+sudo systemctl restart apache2
+```
+You’ve successfully made the redirect permanent to allow only encrypted traffic.
 
 ### Enabling the Changes in Apache
+You’ve made changes and adjusted your firewall, you can enable the SSL and headers modules in Apache, enable your SSL-ready Virtual Host, and restart Apache.
+Enable ```mod_ssl```, the Apache SSL module, and ```mod_headers```, which is needed by some of the settings in the SSL snippet, with the ```a2enmod``` command:
+```
+sudo a2enmod ssl
+sudo a2enmod headers
+```
+
+Enable your SSL Virtual Host with the ```a2ensite``` command:
+```
+sudo a2enconf ssl-params
+```
+
+Enable your ```ssl-params.conf``` file, to read in the values you set:
+```
+sudo a2enconf ssl-params
+```
+At this point, your site and the necessary modules are enabled. Check to make sure that there are no syntax errors in your files with a test:
+```
+sudo apache2ctl configtest
+```
+Result: Syntax OK
+
+### Testing Encryption
+
+Start by opening your web browser and type ```https://``` followed by your server’s domain name or IP into the address bar:
+```
+https://server_domain_or_IP
+```
+Because the certificate you created isn’t signed by one of your browser’s trusted certificate authorities, you will likely receive a warning like the ```Your connection is not private```.
+This is expected and normal. We are only interested in the encryption aspect of our certificate, not the third party validation of our host’s authenticity. Click ADVANCED and then the link provided to proceed to your host anyways.
+You should be taken to your site. In the browser address bar, you will have a lock with an “x” over it. This means that the certificate cannot be validated. It is still encrypting your connection.
 
 
 ### Useful links
