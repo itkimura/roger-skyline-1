@@ -53,6 +53,9 @@ Visual Box > Preference > Default Machine Folder:/goinfre/itkimrua
 
 *This allows you to make Clone of VM
 
+
+CHECK IF UP TO DATE sudo apt update
+
 ## OS update
 ```
 su
@@ -86,6 +89,19 @@ Make new partition by command line in parted mode
 mkpart
 ```
 
+### Eval
+Check the package which is installed
+```
+cat /etc/os-release
+cat /etc/debian_version
+```
+* It should not be TRAEFIK DOCKER VAGRANT
+
+```
+dpkg -l apt list --installed
+```
+
+
 # V.3 Network and Security Part
 ## You must create a non-root user to connect to the machine and work
 Add user
@@ -102,7 +118,7 @@ Give sudo access to a user
 ```
 usermod -aG sudo [username]
 ```
-Also add write permissions to the ```/etc/sudoers``` file. In the file under # User priviledges information, add the new user under the root user with the following:
+Also add write permissions to the ```sudo vim /etc/sudoers``` file. In the file under # User priviledges information, add the new user under the root user with the following:
 ```
 [username] ALL=(ALL:ALL) ALL
 ```
@@ -119,6 +135,12 @@ And add ```export PATH=/usr/sbin:$PATH``` and run ```source ~/.bashrc```. Then r
 ### Enable DHCP
 Visual Box > File > Host Network Manager > Uncheck Enable DHCP Server
 <img width="600" alt="Screen Shot 2022-05-16 at 5 11 41 PM" src="https://user-images.githubusercontent.com/61685238/168617668-9aab0572-8c37-4f11-885e-95eea2602669.png">
+
+Check DHCP status
+```
+sudo service dhcp status
+```
+Result: ```Unit dhcp.service could not be found.```
 
 ### Set preferences of the VM
 * First interface as NAT
@@ -158,14 +180,19 @@ lsof -i:4242
 #Port 22
 Port 4242
 ```
-3.  Syntax check of the configuration file
+3.  Add permission setting
+```
+PermitRootLogin no
+PasswordAuthentication no
+```
+5.  4.  Syntax check of the configuration file
 ```
 sshd -t
 ```
-4.  Restart the sshd searvice ```/etc/init.d/ssh restart``` with this, 
-5.  Set up SSH access with public keys instead. Run ssh-keygen to generate a key pair. Then install the public key on the Virtual Machine OS with the following syntax and set password.
+4.  Restart the sshd searvice ```sudo service ssh restart```
+5.  Set up SSH access with public keys instead. Run ssh-keygen to generate a key pair in the client terminal. Then install the public key on the Virtual Machine OS with the following syntax and set password.
 ```
-ssh-copy-id [username]@[server IP address] -p [port number]
+ssh-copy-id -i /Users/itkimura/.ssh/id_rsa.pub [your_username]@192.168.56.2 -p [you_port]
 ```
 5.  login via ssh from Mac Termonal
 ```
@@ -174,9 +201,7 @@ ssh [username]@[IP address] -p [port number]
 
 Result:
 
-<img width="600" alt="Screen Shot 2022-05-16 at 5 53 09 PM" src="https://user-images.githubusercontent.com/61685238/168621564-3a2be2ff-0f06-4529-8f4f-c5ed65d9d9c3.png">
-
-*To disable the root login directly, edit the ```/etc/ssh/sshd_config file```, chainging the PermitRootLogin setting to no
+<img width="600" alt="Screen Shot 2022-05-18 at 4 22 03 PM" src="https://user-images.githubusercontent.com/61685238/169048884-442619f7-951f-4896-9ca7-b3df8314a3f4.png">
 
 ## You have to set the rules of your firewall on your server only with the services used outside the VM.
 ### Install ufw
@@ -231,6 +256,12 @@ netstat -lntu           #For opened Network ports
 For more information about firewalls:
 * https://www.digitalocean.com/community/tutorials/how-to-set-up-a-firewall-with-ufw-on-debian-10
 * https://opensource.com/article/18/9/linux-iptables-firewalld
+
+### Eval
+```
+sudo ufw status verbose
+sudo iptables -L
+```
 
 ## You have to set a DOS (Denial Of Service Attack) protection on your open ports of your VM.
 ### Set up Apache2 webserver
@@ -317,6 +348,7 @@ Check fail2ban process
 ```
 ps -LC fail2ban-server -o comm,pid,ppid
 ```
+
 ### Test ssh
 Make fail ssh logins from the client to the server
 ```
@@ -333,7 +365,15 @@ Unbanned the IP again
 ```
 sudo fail2ban-client set sshd unbanip 192.168.56.1
 ```
-
+### Eval
+Attack from your mac
+```
+ab -k -c 350 -n 20000 http://192.168.56.2/
+```
+Check if f2b rule for attacker IP has appeared:
+```
+sudo cat /var/log/fail2ban.log
+```
 ## You have to set a protection against scans on your VM’s open ports.
 Portsentry has the capability to use advanced port-scan detection even for the more sophisticated port scans.
 
@@ -368,6 +408,28 @@ sudo service portsentry start
 sudo service portsentry status
 ```
 7. Check open ports and which application is listening on what port by using ```lsof -i```. Portsentry logs in the file ```/var/log/syslog```, where you can see logs of any attacks. The following command also lists blocked IP addresses via iptables ```sudo iptables -L -n -v```. Also test that portsentry has detected a port scan, by running ```sudo nmap -v -A -sV 10.12.203.42``` from another VM. the ```/var/log/syslog``` should who an attackalert from the attacking host IP, and subsequently dropping the packets from the attacker IP.
+
+### Eval
+List of open port on the VM (should be 80, 443, 4242)
+```
+sudo ufw status
+
+or
+
+nmap localhost
+```
+*sudo lsof -i -P (list open files) (ip sockets, port)
+
+Port:
+|Port No|Protocol|Service|
+|--|--|--|
+|21|ftp|File exchange, control|
+|22|ssh|SSH|
+|23|telnet|telnet|
+|25|smtp|Mail：SMTP|
+|80|http|WWW|
+|110|pop3|Receiving emails|
+|443|https||
 
 ## Stop the services you don’t need for this project.
 List the service which are enabled at the moment
@@ -626,7 +688,8 @@ You should be taken to your site. In the browser address bar, you will have a lo
 * <a href="https://stackoverflow.com/questions/51537084/i-installed-apache-2-but-in-sudo-ufw-app-list-there-is-no-apache-applications-in">i installed apache 2 but in sudo ufw app list there is no apache applications in the app list</a>
 
 # VI.2 Deployment Part
-Make a simple deploy.sh script which will email to root if changes in the html code happend, and its also make a backup of my website source files into ```/var/www/html```. And created a temp directory where i copied the same index.html file.
+Make a simple deploy.sh script which will email to root if changes in the html code happend, and its also make a backup of my website source files into ```/var/www/html```. And created a temp directory where i copied the same index.html file.![Uploading Screen Shot 2022-05-18 at 4.22.03 PM.png…]()
+
 
 Paste the script in ```sudo vim /home/itkimura/deploy.sh```
 ```
