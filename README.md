@@ -180,21 +180,24 @@ lsof -i:4242
 #Port 22
 Port 4242
 ```
-3.  Add permission setting
+3.  Syntax check of the configuration file
+```
+sshd -t
+```
+4.  Add permission setting
 ```
 PermitRootLogin no
 PasswordAuthentication no
 ```
-5.  4.  Syntax check of the configuration file
+5.  Restart the sshd searvice
 ```
-sshd -t
+sudo service ssh restart
 ```
-4.  Restart the sshd searvice ```sudo service ssh restart```
-5.  Set up SSH access with public keys instead. Run ssh-keygen to generate a key pair in the client terminal. Then install the public key on the Virtual Machine OS with the following syntax and set password.
+6.  Set up SSH access with public keys instead. Run ssh-keygen to generate a key pair in the client terminal. Then install the public key on the Virtual Machine OS with the following syntax and set password.
 ```
 ssh-copy-id -i /Users/itkimura/.ssh/id_rsa.pub [your_username]@192.168.56.2 -p [you_port]
 ```
-5.  login via ssh from Mac Termonal
+7.  login via ssh from Mac Termonal
 ```
 ssh [username]@[IP address] -p [port number]
 ```
