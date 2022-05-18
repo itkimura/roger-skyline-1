@@ -184,18 +184,18 @@ Port 4242
 ```
 sshd -t
 ```
-4.  Add permission setting
-```
-PermitRootLogin no
-PasswordAuthentication no
-```
-5.  Restart the sshd searvice
+4.  Restart the sshd searvice
 ```
 sudo service ssh restart
 ```
-6.  Set up SSH access with public keys instead. Run ssh-keygen to generate a key pair in the client terminal. Then install the public key on the Virtual Machine OS with the following syntax and set password.
+5.  Set up SSH access with public keys instead. Run ssh-keygen to generate a key pair in the client terminal. Then install the public key on the Virtual Machine OS with the following syntax and set password.
 ```
 ssh-copy-id -i /Users/itkimura/.ssh/id_rsa.pub [your_username]@192.168.56.2 -p [you_port]
+```
+6.  Add permission setting to ``/etc/ssh/sshd_config``` and restart ssh again
+```
+PermitRootLogin no
+PasswordAuthentication no
 ```
 7.  login via ssh from Mac Termonal
 ```
@@ -364,19 +364,23 @@ Result of 5 times fail try:
 Check fail2ban status by ```sudo fail2ban-client status sshd``` and you can see your IP is banned. Result:
 
 <img width="600" alt="Screen Shot 2022-05-17 at 1 38 19 PM" src="https://user-images.githubusercontent.com/61685238/168792856-f3e1a0ad-b85b-44d2-b4e4-c5d9413b667d.png">
+
 Unbanned the IP again
 ```
 sudo fail2ban-client set sshd unbanip 192.168.56.1
 ```
+
 ### Eval
 Attack from your mac
 ```
 ab -k -c 350 -n 20000 http://192.168.56.2/
 ```
+
 Check if f2b rule for attacker IP has appeared:
 ```
 sudo cat /var/log/fail2ban.log
 ```
+
 ## You have to set a protection against scans on your VM’s open ports.
 Portsentry has the capability to use advanced port-scan detection even for the more sophisticated port scans.
 
@@ -416,14 +420,9 @@ sudo service portsentry status
 List of open port on the VM (should be 80, 443, 4242)
 ```
 sudo ufw status
-
-or
-
-nmap localhost
 ```
-*sudo lsof -i -P (list open files) (ip sockets, port)
 
-Port:
+Port example:
 |Port No|Protocol|Service|
 |--|--|--|
 |21|ftp|File exchange, control|
@@ -461,6 +460,7 @@ The services which you need for this project
 |-----|-----|
 |apache2.service|Apache Hypertext Transfer Protocol (HTTP) Server|
 |apparmor.service|Kernel enhancement to confine programs to a limited set of resources|
+|console-setup.service|Provides the console with the same keyboard configuration scheme|
 |cron.service|Daemon to execute scheduled commands (Vixie Cron)|
 |fail2ban.service|A set of server and client programs to limit brute force authentication attempts|
 |getty@.service|Opens a tty port, prompts for login and invokes /bin/login command.|
@@ -468,6 +468,7 @@ The services which you need for this project
 |networking.service|Raises or downs the network interfaces configured in /etc/network/interfaces|
 |rsyslog.service|Syslog server, for managing logs|
 |ssh.service|Open SSH remote login client|
+|sytemd-pstore.service|system service that archives the contents of the Linux persistent storage filesystem, pstore, to other storage, thus preserving the existing information contained in the pstore, and clearing pstore storage for future error events.|
 |systemd-timesyncd.service|Used to synchronize the local system clock with a remote network time protocol server.|
 |ufw.service|Managing a netfilter firewall|
 
