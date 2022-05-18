@@ -691,21 +691,38 @@ You should be taken to your site. In the browser address bar, you will have a lo
 * <a href="https://www.digitalocean.com/community/tutorials/how-to-create-a-self-signed-ssl-certificate-for-apache-in-ubuntu-16-04">How To Create a Self-Signed SSL Certificate for Apache in Ubuntu 16.04</a>
 * <a href="https://stackoverflow.com/questions/51537084/i-installed-apache-2-but-in-sudo-ufw-app-list-there-is-no-apache-applications-in">i installed apache 2 but in sudo ufw app list there is no apache applications in the app list</a>
 
+### Eval
+Check that there is only one active configuration on the webserver and not the default one
+```
+sudo systemctl status apache2
+
+or
+
+sudo cat /etc/ssl/certs/apache-selfsigned.crt
+```
+*Can also try to connect with https stands for secure sockets layer, are web protocols used to wrap normal traffic in a protected, encrypted wrapper.
+
 # VI.2 Deployment Part
 Make a simple deploy.sh script which will email to root if changes in the html code happend, and its also make a backup of my website source files into ```/var/www/html```. And created a temp directory where i copied the same index.html file.![Uploading Screen Shot 2022-05-18 at 4.22.03 PM.png…]()
 
 
-Paste the script in ```sudo vim /home/itkimura/deploy.sh```
+Paste the script in ```sudo vim /usr/local/bin/deploy.sh```
 ```
 #!/bin/bash
-DIFF=$(diff /var/www/temp/index.html /var/www/html/index.html)
+DIFF=$(diff /var/www/temp/index.php /var/www/html/index.php)
 if [ "$DIFF" != "" ]; then
-	cat /var/www/html/index.html > /var/www/temp/index.html
-	sudo cp /var/www/temp/index.html /var/www/html/index.html
-	echo "index.html has been changed modyfied!" | mail -s "Deployment done!" root
+	cat /var/www/html/index.php > /var/www/temp/index.php
+	sudo cp /var/www/temp/index.php /var/www/html/index.php
+	echo "index.php has been changed modyfied!" | mail -s "Deployment done!" root
 fi
 ```
 Add a new task crontab to keep it updated:
 ```
-0 0 * * *  /home/itkimura/deploy.sh
+0 0 * * *  /usr/local/bin/deploy.sh
 ```
+
+### Eval
+```
+sudo apt list --installed | grep apache sudo vim /etc/apache2/sites-available/000-default.conf
+```
+Check execution of script /usr/local/bin/deploy.sh check mail
