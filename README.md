@@ -26,18 +26,18 @@ https://www.debian.org/
 
 ### Partition setting
 Need to create
-*   4.2GB, primary, beggining, ext4, on the root /
-*   500MB, swap
-*   Rest memory, logical, ext4, on /home
+*   4.5GB, primary, beggining, ext4, on the root /
+*   4.1GB, logical, beggining, ext4, on /home
 
 ### How to set up
 1. Choose manual for partitioning method
 <img width="600" alt="Screen Shot 2022-05-10 at 2 01 34 PM" src="https://user-images.githubusercontent.com/61685238/167614839-ff18a034-a170-4540-a773-2a8c125b47a8.png">
 
-2.  Select "SCSI3 (0,0,0) (sda) - 8.6 GB ATA VBOX HARDDISK" to create three partition 
-<img width="600" alt="Screen Shot 2022-05-10 at 2 02 04 PM" src="https://user-images.githubusercontent.com/61685238/167615003-2e9bd710-22f9-4ee7-b7f7-508aaab5de50.png">
+2.  Select "SCSI3 (0,0,0) (sda) - 8.6 GB ATA VBOX HARDDISK" to create two partition 
 
-4. Select swap area for swap partition
+<img width="600" alt="Screen Shot 2022-05-19 at 11 38 50 AM" src="https://user-images.githubusercontent.com/61685238/169251413-fbce4c81-1cd0-49b6-9892-8f6df7d13b2a.png">
+
+*Select swap area for swap partition if you want
 <img width="600" alt="Screen Shot 2022-05-10 at 2 03 35 PM" src="https://user-images.githubusercontent.com/61685238/167615395-d6f91936-c9c9-4af6-bbeb-30ee7f92f513.png">
 
 5.  Check to install SSH server and Standard system utilities
@@ -77,6 +77,15 @@ print all
 Result:
 
 <img width="600" alt="Screen Shot 2022-05-16 at 12 03 36 PM" src="https://user-images.githubusercontent.com/61685238/168557841-1cdaec0f-da67-4148-ad05-38709a7509fe.png">
+
+Or
+
+```
+lsblk
+```
+Result:
+
+<img width="357" alt="Screen Shot 2022-05-19 at 11 29 20 AM" src="https://user-images.githubusercontent.com/61685238/169251590-9eb2fe8d-472e-4b1d-929e-d33ff6914ec0.png">
 
 
 Change pertition size in parted mode
