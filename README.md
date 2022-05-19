@@ -26,8 +26,9 @@ https://www.debian.org/
 
 ### Partition setting
 Need to create
-*   4.5GB, primary, beggining, ext4, on the root /
-*   4.1GB, logical, beggining, ext4, on /home
+*   4.2GB, primary, beggining, ext4, on the root /
+*   3.8GB, logical, beggining, ext4, on /home
+Remaining would be free space or swap
 
 ### How to set up
 1. Choose manual for partitioning method
@@ -162,14 +163,11 @@ Result: ```Unit dhcp.service could not be found.```
 1.  Edit the ```/etc/network/interfaces``` file to setup the primary network. Change the primary network line as
 ```
 # The primary network interface
-auto enp0s3
-iface enp0s3 inet dhcp
-auto enp0s8
-iface enp0s8 inet static
-            address 192.168.56.2
-            netmask 255.255.255.252
+auto enp0s3 static
+            address [IP address (Check by ip a)]
+            gateway [Gateway (Check by ip r)]
 ```
-<img width="600" alt="Screen Shot 2022-05-16 at 5 40 07 PM" src="https://user-images.githubusercontent.com/61685238/168618707-94d87d28-9e8c-40fa-8b7f-faca21162284.png">
+<img width="664" alt="Screen Shot 2022-05-19 at 12 06 06 PM" src="https://user-images.githubusercontent.com/61685238/169371092-a70f07e6-8f2c-4476-a686-513794ef0baa.png">
 
 *```address``` should be unique
 *```netmask``` \30 is 255.255.255.252 Check <a href="https://www.pawprint.net/designresources/netmask-converter.php">Netmask Conversions</a>
