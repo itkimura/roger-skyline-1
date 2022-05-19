@@ -203,6 +203,7 @@ ssh-copy-id -i /Users/itkimura/.ssh/id_rsa.pub [your_username]@192.168.56.2 -p [
 6.  Add permission setting to ``/etc/ssh/sshd_config``` and restart ssh again
 ```
 PermitRootLogin no
+PubkeyAuthentication yes
 PasswordAuthentication no
 ```
 7.  login via ssh from Mac Termonal
@@ -379,14 +380,9 @@ sudo fail2ban-client set sshd unbanip 192.168.56.1
 ```
 
 ### Eval
-Attack from your mac
+Use <a href="https://github.com/gkbrk/slowloris">Solaris</a>
 ```
-ab -k -c 350 -n 20000 http://192.168.56.2/
-```
-
-Check if f2b rule for attacker IP has appeared:
-```
-sudo cat /var/log/fail2ban.log
+python3 slowloris.py example.com
 ```
 
 ## You have to set a protection against scans on your VM’s open ports.
