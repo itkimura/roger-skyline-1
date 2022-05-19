@@ -38,6 +38,7 @@ Need to create
 <img width="600" alt="Screen Shot 2022-05-19 at 11 38 50 AM" src="https://user-images.githubusercontent.com/61685238/169251413-fbce4c81-1cd0-49b6-9892-8f6df7d13b2a.png">
 
 *Select swap area for swap partition if you want
+
 <img width="600" alt="Screen Shot 2022-05-10 at 2 03 35 PM" src="https://user-images.githubusercontent.com/61685238/167615395-d6f91936-c9c9-4af6-bbeb-30ee7f92f513.png">
 
 5.  Check to install SSH server and Standard system utilities
