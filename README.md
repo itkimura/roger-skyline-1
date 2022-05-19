@@ -430,6 +430,7 @@ sudo service portsentry status
 List of open port on the VM (should be 80, 443, 4242)
 ```
 sudo ufw status
+sudo lsof -i -P -n | grep LISTEN
 ```
 
 Port example:
